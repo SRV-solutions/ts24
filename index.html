@@ -1,11 +1,497 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>¡Felicitaciones, Técnico!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,800;1,400&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0e0f1a;
+            --bg-2: #161829;
+            --card: #1d2036;
+            --text: #f4f1ea;
+            --muted: #a9a6b8;
+            --gold: #f2c14e;
+            --pink: #ff7aa2;
+            --cyan: #5ce1e6;
+            --radius: 18px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Inter", system-ui, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+        h1, h2 { font-family: "Fraunces", Georgia, serif; line-height: 1.1; }
+        .mono { font-family: "JetBrains Mono", monospace; }
+
+        section { padding: 90px 16px; }
+        .wrap { max-width: 1100px; margin: 0 auto; }
+        .section-title { font-size: clamp(2rem, 5vw, 3.2rem); text-align: center; margin-bottom: 12px; }
+        .section-sub { text-align: center; color: var(--muted); margin-bottom: 48px; }
+        .accent { color: var(--gold); }
+
+        /* ---------- HERO (carrusel 1: fade a pantalla completa) ---------- */
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 560px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            overflow: hidden;
+            padding: 0 16px;
+        }
+        .hero-slides { position: absolute; inset: 0; }
+        .hero-slides .slide {
+            position: absolute; inset: 0;
+            opacity: 0;
+            transform: scale(1.08);
+            transition: opacity 1.6s ease, transform 7s ease;
+        }
+        .hero-slides .slide.active { opacity: 1; transform: scale(1); }
+        .hero::after {
+            content: "";
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at center, rgba(14,15,26,.55) 0%, rgba(14,15,26,.92) 75%);
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 820px; }
+        .cap { font-size: clamp(3rem, 9vw, 5rem); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 50% { transform: translateY(-12px) rotate(-6deg); } }
+        .hero .kicker {
+            display: inline-block;
+            color: var(--cyan);
+            font-size: .95rem;
+            margin: 10px 0 18px;
+            border: 1px solid rgba(92,225,230,.4);
+            padding: 6px 14px;
+            border-radius: 999px;
+        }
+        .hero h1 { font-size: clamp(2.6rem, 8vw, 5.5rem); font-weight: 800; }
+        .hero h1 .name {
+            background: linear-gradient(90deg, var(--gold), var(--pink));
+            -webkit-background-clip: text; background-clip: text;
+            color: transparent;
+        }
+        .hero p.lead { margin-top: 18px; font-size: clamp(1.05rem, 2.5vw, 1.35rem); color: #ddd8e8; }
+        .typed { color: var(--gold); }
+        .typed::after { content: "▌"; animation: blink 1s steps(1) infinite; color: var(--cyan); }
+        @keyframes blink { 50% { opacity: 0; } }
+        .scroll-hint {
+            position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+            z-index: 2; color: var(--muted); font-size: .85rem; text-decoration: none;
+            animation: bob 2s ease-in-out infinite;
+        }
+        @keyframes bob { 50% { transform: translate(-50%, 8px); } }
+
+        /* ---------- CARRUSEL 2: slider con flechas y puntos ---------- */
+        .slider { position: relative; border-radius: var(--radius); overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+        .slider-track { display: flex; transition: transform .7s cubic-bezier(.65,0,.35,1); }
+        .slider-item { flex: 0 0 100%; position: relative; aspect-ratio: 16 / 9; }
+        .slider-item figcaption {
+            position: absolute; left: 0; right: 0; bottom: 0;
+            padding: 40px 24px 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,.8));
+            font-family: "Fraunces", serif; font-style: italic; font-size: clamp(1rem, 2.5vw, 1.4rem);
+        }
+        .slider-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 48px; height: 48px; border-radius: 50%;
+            border: none; cursor: pointer;
+            background: rgba(255,255,255,.15); backdrop-filter: blur(8px);
+            color: #fff; font-size: 1.4rem;
+            transition: background .2s;
+        }
+        .slider-btn:hover { background: var(--gold); color: var(--bg); }
+        .slider-btn.prev { left: 14px; }
+        .slider-btn.next { right: 14px; }
+        .dots { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        .dots button {
+            width: 10px; height: 10px; border-radius: 999px; border: none; cursor: pointer;
+            background: #444865; transition: all .3s;
+        }
+        .dots button.active { width: 32px; background: var(--gold); }
+
+        /* ---------- MENSAJE ---------- */
+        .message { background: var(--bg-2); }
+        .letter {
+            max-width: 760px; margin: 0 auto;
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: clamp(28px, 6vw, 56px);
+            position: relative;
+            border: 1px solid rgba(242,193,78,.2);
+        }
+        .letter::before {
+            content: "“"; position: absolute; top: -30px; left: 24px;
+            font-family: "Fraunces", serif; font-size: 8rem; color: var(--gold); line-height: 1;
+        }
+        .letter p { font-size: 1.12rem; margin-bottom: 18px; color: #e6e2ee; }
+        .signature { font-family: "Fraunces", serif; font-style: italic; font-size: 1.6rem; color: var(--pink); margin-top: 28px; }
+        .code-block {
+            margin: 28px 0; padding: 20px; border-radius: 12px;
+            background: #0a0b14; font-size: .92rem; overflow-x: auto; white-space: pre;
+            border-left: 3px solid var(--cyan);
+        }
+        .code-block .k { color: var(--pink); }
+        .code-block .s { color: var(--gold); }
+        .code-block .c { color: #6b6f8e; }
+        .code-block .f { color: var(--cyan); }
+
+        /* ---------- CARRUSEL 3: coverflow 3D ---------- */
+        .coverflow {
+            position: relative; height: 420px;
+            perspective: 1200px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cf-item {
+            position: absolute; width: min(300px, 70vw); aspect-ratio: 3 / 4;
+            border-radius: var(--radius); overflow: hidden;
+            transition: transform .6s ease, opacity .6s ease, filter .6s ease;
+            cursor: pointer;
+            box-shadow: 0 20px 50px rgba(0,0,0,.6);
+        }
+        .cf-controls { display: flex; justify-content: center; gap: 16px; margin-top: 24px; }
+        .cf-controls button {
+            padding: 10px 22px; border-radius: 999px; cursor: pointer;
+            border: 1px solid var(--gold); background: transparent; color: var(--gold);
+            font: inherit; transition: all .2s;
+        }
+        .cf-controls button:hover { background: var(--gold); color: var(--bg); }
+
+        /* ---------- CARRUSEL 4: cintas infinitas ---------- */
+        .marquee-section { padding-left: 0; padding-right: 0; background: var(--bg-2); }
+        .marquee { overflow: hidden; margin-bottom: 18px;
+            mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+            -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+        }
+        .marquee-track { display: flex; gap: 18px; width: max-content; animation: scroll 50s linear infinite; }
+        .marquee.reverse .marquee-track { animation-direction: reverse; }
+        .marquee:hover .marquee-track { animation-play-state: paused; }
+        .marquee-item {
+            width: 260px; height: 180px; border-radius: 14px; overflow: hidden; flex-shrink: 0;
+            transition: transform .3s;
+        }
+        .marquee-item:nth-child(odd) { transform: rotate(-2deg); }
+        .marquee-item:nth-child(even) { transform: rotate(2deg); }
+        .marquee-item:hover { transform: scale(1.06) rotate(0); }
+        @keyframes scroll { to { transform: translateX(-50%); } }
+
+        /* ---------- FINAL ---------- */
+        .final { text-align: center; }
+        .final h2 { font-size: clamp(2.2rem, 6vw, 4rem); margin-bottom: 18px; }
+        .final p { color: var(--muted); font-size: 1.15rem; max-width: 620px; margin: 0 auto 36px; }
+        .btn-confetti {
+            padding: 16px 34px; border-radius: 999px; border: none; cursor: pointer;
+            font: 700 1.1rem "Inter", sans-serif; color: var(--bg);
+            background: linear-gradient(90deg, var(--gold), var(--pink));
+            box-shadow: 0 10px 30px rgba(255,122,162,.35);
+            transition: transform .2s;
+        }
+        .btn-confetti:hover { transform: translateY(-3px) scale(1.03); }
+        footer { text-align: center; padding: 30px 16px; color: var(--muted); font-size: .9rem; }
+        footer .heart { color: var(--pink); }
+
+        canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
+
+        .reveal { opacity: 0; transform: translateY(40px); transition: all .9s ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+
+        @media (max-width: 600px) {
+            section { padding: 64px 16px; }
+            .coverflow { height: 360px; }
+            .marquee-item { width: 180px; height: 130px; }
+            .slider-btn { width: 38px; height: 38px; font-size: 1.1rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
 </head>
 <body>
-    
+    <canvas id="confetti"></canvas>
+
+    <!-- HERO -->
+    <header class="hero">
+        <div class="hero-slides" id="heroSlides"></div>
+        <div class="hero-content">
+            <div class="cap">🎓</div>
+            <span class="kicker mono">&lt;Técnico Superior en Programación /&gt; · UTN</span>
+            <h1>¡Felicitaciones, <span class="name" id="friendName"></span>!</h1>
+            <p class="lead mono">&gt; <span class="typed" id="typed"></span></p>
+        </div>
+        <a href="#recuerdos" class="scroll-hint">↓ bajá que hay más</a>
+    </header>
+
+    <!-- SLIDER -->
+    <section id="recuerdos">
+        <div class="wrap reveal">
+            <h2 class="section-title">Momentos <span class="accent">compartidos</span></h2>
+            <p class="section-sub">Algunos recuerdos del camino hasta acá</p>
+            <div class="slider" id="slider">
+                <div class="slider-track" id="sliderTrack"></div>
+                <button class="slider-btn prev" aria-label="Anterior">‹</button>
+                <button class="slider-btn next" aria-label="Siguiente">›</button>
+            </div>
+            <div class="dots" id="sliderDots"></div>
+        </div>
+    </section>
+
+    <!-- MENSAJE -->
+    <section class="message">
+        <div class="letter reveal">
+            <p>Querido amigo:</p>
+            <p>Llegó el día. Después de tantas horas de estudio, parciales, trabajos prácticos a las tres de la mañana y bugs que parecían imposibles, hoy sos <strong>Técnico Superior en Programación</strong> de la UTN. ¡Qué orgullo enorme!</p>
+            <div class="code-block mono"><span class="c">// compilado con éxito ✔</span>
+<span class="k">const</span> amigo = {
+  titulo: <span class="s">"Técnico Superior en Programación"</span>,
+  esfuerzo: <span class="f">Infinity</span>,
+  futuro: <span class="s">"brillante"</span>,
+};
+
+<span class="k">while</span> (amigo.vive) {
+  <span class="f">desearle</span>(<span class="s">"lo mejor"</span>);
+}</div>
+            <p>Sabemos lo mucho que te costó y lo mucho que pusiste. Este título es solo el primer <em>commit</em> de todo lo que vas a construir. Que vengan muchos proyectos lindos, buenos equipos y deploys sin errores.</p>
+            <p>Te queremos muchísimo y esperamos lo mejor para vos, hoy y siempre.</p>
+            <p class="signature">Con todo el cariño,<br>Marcos y Sophy 💛</p>
+        </div>
+    </section>
+
+    <!-- COVERFLOW -->
+    <section>
+        <div class="wrap reveal">
+            <h2 class="section-title">La <span class="accent">galería</span></h2>
+            <p class="section-sub">Tocá una foto para traerla al frente</p>
+            <div class="coverflow" id="coverflow"></div>
+            <div class="cf-controls">
+                <button id="cfPrev">← Anterior</button>
+                <button id="cfNext">Siguiente →</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- CINTAS -->
+    <section class="marquee-section">
+        <h2 class="section-title reveal">Un montón de <span class="accent">recuerdos</span></h2>
+        <p class="section-sub reveal">…y los que faltan</p>
+        <div class="marquee"><div class="marquee-track" id="marquee1"></div></div>
+        <div class="marquee reverse"><div class="marquee-track" id="marquee2"></div></div>
+    </section>
+
+    <!-- FINAL -->
+    <section class="final">
+        <div class="wrap reveal">
+            <h2>Esto recién <span class="accent">empieza</span> 🚀</h2>
+            <p>Que este logro sea el comienzo de un camino lleno de éxitos. ¡A festejar como se merece!</p>
+            <button class="btn-confetti" id="btnConfetti">🎉 ¡Festejar!</button>
+        </div>
+    </section>
+
+    <footer>Hecho con <span class="heart">♥</span> por Marcos y Sophy</footer>
+
+    <script>
+        // ===== CONFIGURACIÓN =====
+        // Cambiá el nombre de tu amigo acá:
+        const NOMBRE = "Amigo";
+
+        // Fotos: se buscan en la carpeta "fotos/" (foto1.jpg, foto2.jpg, ...).
+        // Si un archivo no existe, se muestra una foto de stock en su lugar.
+        const EXT = "jpg";
+        const foto = (n) => ({
+            local: `fotos/foto${n}.${EXT}`,
+            stock: `https://picsum.photos/seed/utn-${n}/1200/800`,
+        });
+        const rango = (desde, hasta) => Array.from({ length: hasta - desde + 1 }, (_, i) => foto(desde + i));
+
+        const HERO = rango(1, 5);
+        const SLIDER = rango(6, 13);
+        const COVERFLOW = rango(14, 22);
+        const MARQUEE = rango(23, 40);
+
+        const CAPTIONS = [
+            "El primer día de cursada",
+            "Esas noches de estudio interminables",
+            "Cuando por fin compiló",
+            "Juntos en las buenas",
+            "Y también en las de los parciales",
+            "Las juntadas de siempre",
+            "Aprendiendo un lenguaje nuevo",
+            "¡Y hoy, recibido!",
+        ];
+
+        function crearImg({ local, stock }, alt = "Recuerdo") {
+            const img = document.createElement("img");
+            img.alt = alt;
+            img.loading = "lazy";
+            img.src = local;
+            img.onerror = () => { img.onerror = null; img.src = stock; };
+            return img;
+        }
+
+        document.getElementById("friendName").textContent = NOMBRE;
+
+        // ===== Texto tipeado =====
+        const frases = [
+            "console.log('¡Lo lograste!');",
+            "git commit -m 'Título obtenido'",
+            "Build successful ✔",
+            "Te queremos mucho 💛",
+        ];
+        const typedEl = document.getElementById("typed");
+        let fi = 0, ci = 0, borrando = false;
+        (function tipear() {
+            const f = frases[fi];
+            typedEl.textContent = f.slice(0, ci);
+            if (!borrando && ci < f.length) ci++;
+            else if (!borrando) { borrando = true; return setTimeout(tipear, 1800); }
+            else if (ci > 0) ci--;
+            else { borrando = false; fi = (fi + 1) % frases.length; }
+            setTimeout(tipear, borrando ? 35 : 75);
+        })();
+
+        // ===== Carrusel 1: hero =====
+        const heroBox = document.getElementById("heroSlides");
+        HERO.forEach((f, i) => {
+            const d = document.createElement("div");
+            d.className = "slide" + (i === 0 ? " active" : "");
+            d.appendChild(crearImg(f));
+            heroBox.appendChild(d);
+        });
+        let heroIdx = 0;
+        setInterval(() => {
+            const s = heroBox.children;
+            s[heroIdx].classList.remove("active");
+            heroIdx = (heroIdx + 1) % s.length;
+            s[heroIdx].classList.add("active");
+        }, 5000);
+
+        // ===== Carrusel 2: slider =====
+        const track = document.getElementById("sliderTrack");
+        const dotsBox = document.getElementById("sliderDots");
+        SLIDER.forEach((f, i) => {
+            const fig = document.createElement("figure");
+            fig.className = "slider-item";
+            fig.appendChild(crearImg(f, CAPTIONS[i]));
+            const cap = document.createElement("figcaption");
+            cap.textContent = CAPTIONS[i] || "";
+            fig.appendChild(cap);
+            track.appendChild(fig);
+            const dot = document.createElement("button");
+            dot.setAttribute("aria-label", `Ir a la foto ${i + 1}`);
+            dot.onclick = () => irA(i);
+            dotsBox.appendChild(dot);
+        });
+        let sIdx = 0, sTimer;
+        function irA(i) {
+            sIdx = (i + SLIDER.length) % SLIDER.length;
+            track.style.transform = `translateX(-${sIdx * 100}%)`;
+            [...dotsBox.children].forEach((d, j) => d.classList.toggle("active", j === sIdx));
+            clearInterval(sTimer);
+            sTimer = setInterval(() => irA(sIdx + 1), 4500);
+        }
+        document.querySelector(".slider-btn.prev").onclick = () => irA(sIdx - 1);
+        document.querySelector(".slider-btn.next").onclick = () => irA(sIdx + 1);
+        let touchX = null;
+        track.addEventListener("touchstart", (e) => (touchX = e.touches[0].clientX), { passive: true });
+        track.addEventListener("touchend", (e) => {
+            if (touchX === null) return;
+            const dx = e.changedTouches[0].clientX - touchX;
+            if (Math.abs(dx) > 40) irA(sIdx + (dx < 0 ? 1 : -1));
+            touchX = null;
+        });
+        irA(0);
+
+        // ===== Carrusel 3: coverflow =====
+        const cf = document.getElementById("coverflow");
+        const cfItems = COVERFLOW.map((f, i) => {
+            const d = document.createElement("div");
+            d.className = "cf-item";
+            d.appendChild(crearImg(f));
+            d.onclick = () => { cfIdx = i; pintarCF(); };
+            cf.appendChild(d);
+            return d;
+        });
+        let cfIdx = Math.floor(COVERFLOW.length / 2);
+        function pintarCF() {
+            const paso = Math.min(window.innerWidth * 0.18, 170);
+            cfItems.forEach((el, i) => {
+                const off = i - cfIdx;
+                const abs = Math.abs(off);
+                el.style.transform = `translateX(${off * paso}px) translateZ(${-abs * 120}px) rotateY(${off * -35}deg)`;
+                el.style.zIndex = 100 - abs;
+                el.style.opacity = abs > 3 ? 0 : 1;
+                el.style.filter = abs === 0 ? "none" : `brightness(${1 - abs * 0.18})`;
+            });
+        }
+        document.getElementById("cfPrev").onclick = () => { cfIdx = Math.max(0, cfIdx - 1); pintarCF(); };
+        document.getElementById("cfNext").onclick = () => { cfIdx = Math.min(cfItems.length - 1, cfIdx + 1); pintarCF(); };
+        window.addEventListener("resize", pintarCF);
+        pintarCF();
+
+        // ===== Carrusel 4: cintas infinitas =====
+        function llenarCinta(id, fotos) {
+            const t = document.getElementById(id);
+            [...fotos, ...fotos].forEach((f) => {
+                const d = document.createElement("div");
+                d.className = "marquee-item";
+                d.appendChild(crearImg(f));
+                t.appendChild(d);
+            });
+        }
+        const mitad = Math.ceil(MARQUEE.length / 2);
+        llenarCinta("marquee1", MARQUEE.slice(0, mitad));
+        llenarCinta("marquee2", MARQUEE.slice(mitad));
+
+        // ===== Aparecer al hacer scroll =====
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((e) => e.isIntersecting && e.target.classList.add("visible"));
+        }, { threshold: 0.15 });
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+        // ===== Confeti =====
+        const canvas = document.getElementById("confetti");
+        const ctx = canvas.getContext("2d");
+        let piezas = [];
+        const colores = ["#f2c14e", "#ff7aa2", "#5ce1e6", "#ffffff", "#9b8cff"];
+        function ajustar() { canvas.width = innerWidth; canvas.height = innerHeight; }
+        ajustar(); addEventListener("resize", ajustar);
+        function lanzarConfeti() {
+            for (let i = 0; i < 180; i++) {
+                piezas.push({
+                    x: Math.random() * canvas.width,
+                    y: -20 - Math.random() * canvas.height * 0.5,
+                    w: 6 + Math.random() * 6, h: 8 + Math.random() * 8,
+                    vy: 2 + Math.random() * 3, vx: -1.5 + Math.random() * 3,
+                    rot: Math.random() * 360, vr: -6 + Math.random() * 12,
+                    color: colores[Math.floor(Math.random() * colores.length)],
+                });
+            }
+        }
+        (function animar() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            piezas.forEach((p) => {
+                p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rot * Math.PI) / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                ctx.restore();
+            });
+            piezas = piezas.filter((p) => p.y < canvas.height + 20);
+            requestAnimationFrame(animar);
+        })();
+        document.getElementById("btnConfetti").onclick = lanzarConfeti;
+        setTimeout(lanzarConfeti, 600);
+    </script>
 </body>
 </html>
